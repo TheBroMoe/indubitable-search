@@ -2,8 +2,10 @@
 import requests
 import bs4
 from bs4 import BeautifulSoup
+import webbrowser
 import pandas as pd
 import time
+from datetime import datetime
 
 def extract_job_title_from_result(soup): 
   jobs = []
@@ -53,26 +55,65 @@ def extract_summary_from_result(soup):
     summaries.append(span.text.strip())
   return(summaries)
 
-if __name__ == "__main__":
-  print("Reading...")
+def extract_urls_from_result(soup):
+  urls = []
+  for div in soup.find_all(name='div', attrs={'class':'row'}):
+    for a in div.find_all(name='a', attrs={'data-tn-element':'jobTitle'}):
+      urls.append("https://www.indeed.ca/{}".format(a['href']))
+  return(urls)
 
-  URL = "https://www.indeed.ca/jobs?q=data+scientist+%2420%2C000&l=Edmonton%2C+AB"
+def extract_number_of_results(soup):
+  result_str = soup.find(name='div', attrs={'id':'searchCount'}).text.strip().split()
+  return int(result_str[3])
+
+if __name__ == "__main__":
+
+  # Build URL
+  
+  given_job_title = input("Enter Job Title: ").replace(" ", "+")
+
+  city_set = list()
+
+  while True:
+    given_city = input("Enter List of Desired Cities (Press enter to continue after): ")
+
+    if given_city == "":
+      if len(city_set) > 0:
+        break
+      else:
+        print("Error: Enter at least one city")
+    else:
+      given_city = given_city.replace(" ", "+")
+      city_set.append(given_city)
+  
+  
+  print("Extracting...")
+  
+  # Create Resulting URL
+  URL = "https://www.indeed.ca/jobs?q={}&l={}".format(given_job_title, city_set[0])
 
   #conducting a request of the stated URL above:
   page = requests.get(URL)
 
+
   soup = BeautifulSoup(page.text, 'html.parser')
 
-  max_results_per_city = 100
-  city_set = ['New+York','Chicago','San+Francisco', 'Austin', 'Seattle', 'Los+Angeles', 'Philadelphia', 'Atlanta', 'Dallas', 'Pittsburgh', 'Portland', 'Phoenix', 'Denver', 'Houston', 'Miami', 'Washington+DC', 'Boulder']
-  columns = ['city', 'job_title', 'company_name', 'location', 'summary', 'salary']
+  result_count = extract_number_of_results(soup)
+  
+  print(result_count)
+
+  columns = ['city', 'job_title', 'company_name', 'location', 'summary', 'url']
+
+  sample_dataframe = pd.DataFrame(columns = columns)
   
   # Use methods to extract to lists
   job_title_list = extract_job_title_from_result(soup)
   company_name_list = extract_company_from_result(soup)
   locations_list = extract_location_from_result(soup)
-  # PROPERLY IMPLEMENT
-  salaries_list = extract_salary_from_result(soup)
   summaries_list = extract_summary_from_result(soup)
+  urls_list = extract_urls_from_result(soup)
 
-  print(salaries_list)
+  #webbrowser.open(urls_list[0], new = 2)
+
+  
+  
