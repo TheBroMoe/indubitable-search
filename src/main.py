@@ -7,6 +7,7 @@ import time
 import os
 from datetime import datetime
 from scraper import Scraper
+
 def main():
 
   # Initialize Data Storage
