@@ -11,8 +11,9 @@ from scraper import Scraper
 class Command_Line_Iterface:
 
     def __init__(self, url):
+        # Variables
         self.base_url = url
-        self.init_data_structure()
+        self.initialize_data_structure()
         self.scraper = Scraper()
         self.exit = False
         self.save_all = False
@@ -23,9 +24,11 @@ class Command_Line_Iterface:
         self.city_set = list()
         self.city_result_count = 0
         self.current_city = dict()
+
+        # Constants
         self.search_increment = 20
     
-    def init_data_structure(self):
+    def initialize_data_structure(self):
 
         self.city_jobs_dict = dict()
         
@@ -35,19 +38,35 @@ class Command_Line_Iterface:
         self.city_jobs_dict["date"] = list()
         self.city_jobs_dict["summary"] = list()
         self.city_jobs_dict["url"] = list() 
+
+    def start(self):
+        '''
+        Starts Main Loop
+        '''
+        while True:
+            self.clear_function()
+            self.display_title()
+
+            self.get_initial_parameters()
+            
+            if self.exit:
+                break
+
+            self.start_job_search()
+
+        self.save_to_csv()
+        print("Happy Hunting!")
     
     def clear_function(self):
         os.system('cls||clear')
 
     def display_title(self):
-        print("Welcome to the job hunting app!")
+        print("Welcome to the Indubitable Search!")
         print("Today's Date: {}".format(self.current_date))
         print("Enter X to exit program")
         print("=========================")
     
     def get_initial_parameters(self):
-        self.clear_function()
-        self.display_title()
         self.get_job_title()
 
         if self.exit:
@@ -86,6 +105,7 @@ class Command_Line_Iterface:
 
     def start_job_search(self):
         self.save_all = False
+   
         print("Extracting...")
 
         for city in self.city_set:
@@ -151,7 +171,7 @@ class Command_Line_Iterface:
             # Open page
             elif self.user_response.lower() == "v":
                 print("opening in browser now")
-                self.open_browser_to_url()
+                self.open_browser_to_url(self.current_city['url'][self.current_index])
             
             # Save post to dict
             elif self.user_response.lower() == "s":
@@ -182,12 +202,12 @@ class Command_Line_Iterface:
             else:
                 print("Invalid Input! Try again")
 
-    def open_browser_to_url(self):
-        webbrowser.open(self.current_city['url'][self.current_index], new = 2)
+    def open_browser_to_url(self, url):
+        webbrowser.open(url, new = 2)
             
     def display_prompt_message(self):
         print("What do you want to do?")
-        print("[N]ext Post | [V]iew Post | [S]ave post | Save all posts from [P]age | Save all posts from [C]ity | Save [A]ll posts from search | E[X]it Program")
+        print("[N]ext Post | [V]iew Post | [S]ave post | Save all posts from [P]age | Save all posts from [C]ity | Save [A]ll posts from search | E[X]it")
 
 
     def display_current_job(self):
@@ -209,6 +229,7 @@ class Command_Line_Iterface:
             self.city_jobs_dict["url"].append(self.current_city["url"][self.current_index])
         except IndexError:
             return
+
     def extract_current_page_lists(self, current_soup):
         self.initialize_current_city()
 
@@ -233,16 +254,6 @@ class Command_Line_Iterface:
         jobs_dataframe = pd.DataFrame.from_dict(self.city_jobs_dict)
         jobs_dataframe.to_csv(current_date_filename, index=False)
 
-    def start(self):
-        while True:
-            self.get_initial_parameters()
-            
-            if self.exit:
-                break
 
-            self.start_job_search()
-
-        self.save_to_csv()
-        print("Happy Hunting!")
 
 
