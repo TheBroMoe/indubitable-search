@@ -57,7 +57,7 @@ class Command_Line_Iterface:
 
     def get_job_title(self):
         print("Enter Job Title:")
-        while true:
+        while True:
             self.given_job_title = input()
             if self.given_job_title.strip() == "":
                 print("Error: Enter a Job Title")
@@ -133,11 +133,11 @@ class Command_Line_Iterface:
                         self.display_current_job()
                         self.prompt_user()
                     else:
-                        save_post()
+                        self.save_post()
                 else:
-                        save_post()
+                        self.save_post()
             else:
-                        save_post()
+                        self.save_post()
                     
     def prompt_user(self):
         self.display_prompt_message()
@@ -183,7 +183,7 @@ class Command_Line_Iterface:
                 print("Invalid Input! Try again")
 
     def open_browser_to_url(self):
-        webbrowser.open(current_city['url'][self.current_index], new = 2)
+        webbrowser.open(self.current_city['url'][self.current_index], new = 2)
             
     def display_prompt_message(self):
         print("What do you want to do?")
@@ -243,5 +243,6 @@ class Command_Line_Iterface:
             self.start_job_search()
 
         self.save_to_csv()
+        print("Happy Hunting!")
 
 
