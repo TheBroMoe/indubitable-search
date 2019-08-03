@@ -209,7 +209,6 @@ class Command_Line_Iterface:
         print("What do you want to do?")
         print("[N]ext Post | [V]iew Post | [S]ave post | Save all posts from [P]age | Save all posts from [C]ity | Save [A]ll posts from search | E[X]it")
 
-
     def display_current_job(self):
         print("=========================")
         print("Job Title: {}".format(self.current_city["title"][self.current_index]))
@@ -249,7 +248,10 @@ class Command_Line_Iterface:
         self.current_city["url"] = list() 
 
     def save_to_csv(self):
-        current_date_filename = "jobs/{}.csv".format(self.current_date)
+        directory = "jobs"
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+        current_date_filename = "{}/{}.csv".format(directory, self.current_date)
         print("Saving to {}".format(current_date_filename))  
         jobs_dataframe = pd.DataFrame.from_dict(self.city_jobs_dict)
         jobs_dataframe.to_csv(current_date_filename, index=False)
