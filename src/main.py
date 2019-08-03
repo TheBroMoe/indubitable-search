@@ -36,28 +36,12 @@ def extract_location_from_result(soup):
     locations.append(span.text)
   return(locations)
 
-def extract_salary_from_result(soup): 
-  salaries = []
-  for div in soup.find_all(name='div', attrs={'class':'row'}):
-    try:
-      salaries.append(div.find('nobr').text)
-    except:
-      try:
-        div_two = div.find(name='div', attrs={'class':'sjcl'})
-        div_three = div_two.find('div')
-        salaries.append(div_three.text.strip())
-      except:
-        salaries.append('N/A')
-  return(salaries)
-
 def extract_date_from_result(soup):
   dates = []
   spans = soup.findAll('span', attrs={'class': 'date'})
   for span in spans:
     dates.append(span.text)
   return(dates)
-
-
 
 def extract_summary_from_result(soup): 
   summaries = []
@@ -95,6 +79,9 @@ def main():
   exit_requested = False
 
   while True:
+
+    save_all_posts = False
+
     if exit_requested:
         break
     
@@ -132,6 +119,7 @@ def main():
     
     # Create Resulting URL
     for city in city_set:
+      save_all_cities = False
       if exit_requested:
         break
       
@@ -168,34 +156,72 @@ def main():
           if exit_requested:
             break
           
-          if a_not_selected:
-            # Print Posting
-            print("=========================")
-            print("Job Title: {}".format(current_titles[i]))
-            print("Company Name: {}".format(current_companies[i]))
-            print("Location: {}".format(current_locations[i]))
-            print("Date Posted: {}".format(current_dates[i]))
-            print("Summary: {}".format(current_summaries[i]))
-            print("=========================")
+          if not save_all_posts:
+            if not save_all_cities:
 
-            # Prompt User
-            print("What do you want to do?")
-            print("[N]ext Post | [V]iew Post | [S]ave Post | [A]dd all posts from page | E[X]it Program")
+              if a_not_selected:
+                # Print Posting
+                print("=========================")
+                print("Job Title: {}".format(current_titles[i]))
+                print("Company Name: {}".format(current_companies[i]))
+                print("Location: {}".format(current_locations[i]))
+                print("Date Posted: {}".format(current_dates[i]))
+                print("Summary: {}".format(current_summaries[i]))
+                print("=========================")
 
-            while True:
-              # Get user input
-              user_response = input()
+                # Prompt User
+                print("What do you want to do?")
+                print("[N]ext Post | [V]iew Post | [S]ave post | Save all posts from [P]age | Save all posts from [C]ity | Save [A]ll posts from search | E[X]it Program")
 
-              # Go to next post
-              if user_response.lower() == "n":
-                break
+                while True:
+                  # Get user input
+                  user_response = input()
+
+                  # Go to next post
+                  if user_response.lower() == "n":
+                    break
+                  
+                  # Open page
+                  elif user_response.lower() == "v":
+                    webbrowser.open(current_urls[i], new = 2)
+                  
+                  # Save post to dict
+                  elif user_response.lower() == "s":
+                    try:
+                      city_jobs_dict["title"].append(current_titles[i])
+                      city_jobs_dict["company"].append(current_companies[i])
+                      city_jobs_dict["location"].append(current_locations[i])
+                      city_jobs_dict["date"].append(current_dates[i])
+                      city_jobs_dict["summary"].append(current_summaries[i])
+                      city_jobs_dict["url"].append(current_urls[i])
+                    except IndexError:
+                      break
+                    print("Post Saved!")
+                  
+                  # Set flag to save the rest of the posts
+                  elif user_response.lower() == "p":
+                    print("Posts Saved!")
+                    a_not_selected = False
+                    break
+                  
+                  elif user_response.lower() == "c":
+                    print("Saving posts, this will take a few seconds...")
+                    save_all_cities = True
+                    break
+
+                  elif user_response.lower() == "a":
+                    print("Saving posts, this will take a few seconds...")
+                    save_all_posts = True
+                    break
+                  
+                  elif user_response.lower() == "x":
+                    exit_requested = True
+                    break
+
+                  else:
+                    print("Invalid Input! Try again")
               
-              # Open page
-              elif user_response.lower() == "v":
-                webbrowser.open(current_urls[i], new = 2)
-              
-              # Save post to dict
-              elif user_response.lower() == "s":
+              else:
                 try:
                   city_jobs_dict["title"].append(current_titles[i])
                   city_jobs_dict["company"].append(current_companies[i])
@@ -205,31 +231,26 @@ def main():
                   city_jobs_dict["url"].append(current_urls[i])
                 except IndexError:
                   break
-                print("Post Saved!")
-              
-              # Set flag to save the rest of the posts
-              elif user_response.lower() == "a":
-                print("Posts Saved!")
-                a_not_selected = False
-                break
-              
-              elif user_response.lower() == "x":
-                exit_requested = True
-                break
-
-              else:
-                print("Invalid Input! Try again")
-          
+            else:
+                try:
+                  city_jobs_dict["title"].append(current_titles[i])
+                  city_jobs_dict["company"].append(current_companies[i])
+                  city_jobs_dict["location"].append(current_locations[i])
+                  city_jobs_dict["date"].append(current_dates[i])
+                  city_jobs_dict["summary"].append(current_summaries[i])
+                  city_jobs_dict["url"].append(current_urls[i])
+                except IndexError:
+                  break
           else:
-            try:
-              city_jobs_dict["title"].append(current_titles[i])
-              city_jobs_dict["company"].append(current_companies[i])
-              city_jobs_dict["location"].append(current_locations[i])
-              city_jobs_dict["date"].append(current_dates[i])
-              city_jobs_dict["summary"].append(current_summaries[i])
-              city_jobs_dict["url"].append(current_urls[i])
-            except IndexError:
-              break
+                try:
+                  city_jobs_dict["title"].append(current_titles[i])
+                  city_jobs_dict["company"].append(current_companies[i])
+                  city_jobs_dict["location"].append(current_locations[i])
+                  city_jobs_dict["date"].append(current_dates[i])
+                  city_jobs_dict["summary"].append(current_summaries[i])
+                  city_jobs_dict["url"].append(current_urls[i])
+                except IndexError:
+                  break
 
         time.sleep(1)
 
