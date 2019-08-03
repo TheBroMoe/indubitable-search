@@ -6,64 +6,8 @@ import pandas as pd
 import time
 import os
 from datetime import datetime
-
-
-
-def extract_job_title_from_result(soup): 
-  jobs = []
-  for div in soup.find_all(name='div', attrs={'class':'row'}):
-    for a in div.find_all(name='a', attrs={'data-tn-element':'jobTitle'}):
-      jobs.append(a['title'])
-  return(jobs)
-
-def extract_company_from_result(soup): 
-  companies = []
-  for div in soup.find_all(name='div', attrs={'class':'row'}):
-    company = div.find_all(name='span', attrs={'class':'company'})
-    if len(company) > 0:
-      for b in company:
-        companies.append(b.text.strip())
-    else:
-      sec_try = div.find_all(name='span', attrs={'class':'result-link-source'})
-      for span in sec_try:
-        companies.append(span.text.strip())
-  return(companies)
-
-def extract_location_from_result(soup): 
-  locations = []
-  spans = soup.findAll('span', attrs={'class': 'location'})
-  for span in spans:
-    locations.append(span.text)
-  return(locations)
-
-def extract_date_from_result(soup):
-  dates = []
-  spans = soup.findAll('span', attrs={'class': 'date'})
-  for span in spans:
-    dates.append(span.text)
-  return(dates)
-
-def extract_summary_from_result(soup): 
-  summaries = []
-  spans = soup.findAll('div', attrs={'class': 'summary'})
-  for span in spans:
-    summaries.append(span.text.strip())
-  return(summaries)
-
-def extract_urls_from_result(soup):
-  urls = []
-  for div in soup.find_all(name='div', attrs={'class':'row'}):
-    for a in div.find_all(name='a', attrs={'data-tn-element':'jobTitle'}):
-      urls.append("https://www.indeed.ca/{}".format(a['href']))
-  return(urls)
-
-def extract_number_of_results(soup):
-  result_str = soup.find(name='div', attrs={'id':'searchCount'}).text.strip().split()
-  return int(result_str[3])
-
-
+from scraper import Scraper
 def main():
-
 
   # Initialize Data Storage
   city_jobs_dict = dict()
@@ -77,6 +21,8 @@ def main():
   city_jobs_dict["url"] = list() 
   
   exit_requested = False
+
+  scraper = Scraper()
 
   while True:
 
@@ -128,7 +74,7 @@ def main():
       # Conducting a request of the stated URL above:
       page = requests.get(URL)
       soup = BeautifulSoup(page.text, 'html.parser')
-      result_count = extract_number_of_results(soup)
+      result_count = scraper.extract_number_of_results(soup)
 
       print("Results Found for '{}': {}".format(city, result_count))
 
@@ -142,12 +88,12 @@ def main():
         current_soup = BeautifulSoup(current_page.text, 'html.parser')
             
         # Use methods to extract to lists
-        current_titles = extract_job_title_from_result(current_soup)
-        current_companies = extract_company_from_result(current_soup)
-        current_locations = extract_location_from_result(current_soup)
-        current_dates = extract_date_from_result(current_soup)
-        current_summaries = extract_summary_from_result(current_soup)
-        current_urls = extract_urls_from_result(current_soup)
+        current_titles = scraper.extract_job_title_from_result(current_soup)
+        current_companies = scraper.extract_company_from_result(current_soup)
+        current_locations = scraper.extract_location_from_result(current_soup)
+        current_dates = scraper.extract_date_from_result(current_soup)
+        current_summaries = scraper.extract_summary_from_result(current_soup)
+        current_urls = scraper.extract_urls_from_result(current_soup)
 
         a_not_selected = True
         
