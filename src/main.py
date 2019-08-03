@@ -78,7 +78,7 @@ def main():
       result_count = scraper.extract_number_of_results(soup)
 
       print("Results Found for '{}': {}".format(city, result_count))
-
+      
       for index in range(0, result_count, 20):
         if exit_requested:
           break
