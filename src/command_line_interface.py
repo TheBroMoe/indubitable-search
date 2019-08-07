@@ -44,6 +44,7 @@ class Command_Line_Iterface:
         Starts Main Loop
         '''
         while True:
+            self.exit = False
             self.clear_function()
             self.display_title()
 
@@ -84,7 +85,6 @@ class Command_Line_Iterface:
                 self.exit = True
                 return
             else:
-                self.given_job_title = self.given_job_title.replace(" ", "+")
                 return
         
     def get_city_set(self):
@@ -100,8 +100,12 @@ class Command_Line_Iterface:
                 self.exit = True
                 break
             else:
-                given_city = given_city.replace(" ", "+")
                 self.city_set.append(given_city)
+
+    def replace_symbols(self, given_str):
+        given_str = given_str.replace(" ", "+")
+        given_str = given_str.replace(",", "%2C")
+        return given_str
 
     def start_job_search(self):
         self.save_all = False
@@ -129,7 +133,7 @@ class Command_Line_Iterface:
         self.city_result_count = self.scraper.extract_number_of_results(soup)
 
     def generate_url(self, city, page_index=0):
-        return "{}/jobs?q={}&l={}&start={}".format(self.base_url, self.given_job_title, city, page_index)
+        return "{}/jobs?q={}&l={}&start={}".format(self.base_url, self.replace_symbols(self.given_job_title), self.replace_symbols(city), page_index)
     
     def generate_soup_object(self, url):
         page = requests.get(url)
