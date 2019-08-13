@@ -155,7 +155,7 @@ class Command_Line_Iterface:
                 if not self.save_cities:
                     if not self.save_page:
                         self.display_current_job()
-                        self.prompt_user()
+                        self.prompt_user_job_options()
                     else:
                         self.save_post()
                 else:
@@ -163,14 +163,30 @@ class Command_Line_Iterface:
             else:
                         self.save_post()
                     
-    def prompt_user(self):
-        self.display_prompt_message()
+    def prompt_user_job_options(self):
+        self.display_job_prompt_message()
         while True:
             self.user_response = input()
             
-            # Go to next post
+            # Go to next 
             if self.user_response.lower() == "n":
-                return
+                # Save post to dict
+                response = self.prompt_user_next_options()
+            
+                # Set flag to save the rest of the posts
+                if response == "p":
+                    self.save_page = True
+                    return
+            
+                elif self.user_response.lower() == "c":
+                    print("Saving posts, this will take a few seconds...")
+                    self.save_cities = True
+                    return
+
+                elif self.user_response.lower() == "a":
+                    print("Saving posts, this will take a few seconds...")
+                    self.save_all = True
+                    return
             
             # Open page
             elif self.user_response.lower() == "v":
@@ -179,24 +195,23 @@ class Command_Line_Iterface:
             
             # Save post to dict
             elif self.user_response.lower() == "s":
-                self.save_post()
-                print("Post Saved!")
+                response = self.prompt_user_save_options()
             
-            # Set flag to save the rest of the posts
-            elif self.user_response.lower() == "p":
-                print("Posts Saved!")
-                self.save_page = True
-                return
+                # Set flag to save the rest of the posts
+                if response == "p":
+                    print("Posts Saved!")
+                    self.save_page = True
+                    return
             
-            elif self.user_response.lower() == "c":
-                print("Saving posts, this will take a few seconds...")
-                self.save_cities = True
-                return
+                elif self.user_response.lower() == "c":
+                    print("Saving posts, this will take a few seconds...")
+                    self.save_cities = True
+                    return
 
-            elif self.user_response.lower() == "a":
-                print("Saving posts, this will take a few seconds...")
-                self.save_all = True
-                return
+                elif self.user_response.lower() == "a":
+                    print("Saving posts, this will take a few seconds...")
+                    self.save_all = True
+                    return
             
             elif self.user_response.lower() == "x":
                 self.exit = True
@@ -206,12 +221,58 @@ class Command_Line_Iterface:
             else:
                 print("Invalid Input! Try again")
 
+    def prompt_user_save_options(self):
+        self.display_save_prompt_message()
+        while True:
+            self.user_response = input()
+            
+            if self.user_response.lower() == "p":
+                return "p"
+            
+            elif self.user_response.lower() == "c":
+                return "c"
+
+            elif self.user_response.lower() == "a":
+                return "a"
+            
+            elif self.user_response.lower() == "b":
+                return "b"
+            else:
+                print("Invalid Input! Try again")
+
+    def prompt_user_next_options(self):
+        self.display_next_prompt_message()
+        while True:
+            self.user_response = input()
+            
+            if self.user_response.lower() == "p":
+                return "p"
+            
+            elif self.user_response.lower() == "c":
+                return "c"
+
+            elif self.user_response.lower() == "a":
+                return "a"
+            
+            elif self.user_response.lower() == "b":
+                return "b"
+            else:
+                print("Invalid Input! Try again")
+
     def open_browser_to_url(self, url):
         webbrowser.open(url, new = 2)
             
-    def display_prompt_message(self):
+    def display_job_prompt_message(self):
         print("What do you want to do?")
-        print("[N]ext Post | [V]iew Post | [S]ave post | Save all posts from [P]age | Save all posts from [C]ity | Save [A]ll posts from search | E[X]it")
+        print("[N]ext Post | [V]iew Post | [S]ave | Ski[P] | [B]ack")
+    
+    def display_next_prompt_message(self):
+        print("Where do you which to skip?")
+        print("[P]age | [C]ity | [A]ll | [B]ack")
+    
+    def display_save_prompt_message(self):
+        print("What do you want to do?")
+        print("[P]age Posts | [C]ity Posts | [A]ll Posts | [B]ack")
 
     def display_current_job(self):
         print("=========================")
