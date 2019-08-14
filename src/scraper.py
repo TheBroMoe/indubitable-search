@@ -51,4 +51,4 @@ class Scraper:
 
   def extract_number_of_results(self, soup):
     result_str = soup.find(name='div', attrs={'id':'searchCount'}).text.strip().split()
-    return int(result_str[3])
+    return int(result_str[3].replace(',', ''))

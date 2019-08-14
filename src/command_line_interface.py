@@ -19,11 +19,15 @@ class Command_Line_Iterface:
         self.save_all = False
         self.save_cities = False
         self.save_page = False
-        self.current_date = str(datetime.today()).split()[0]
+        self.next_city = False
+        self.next_page = False
         self.given_job_title = ""
         self.city_set = list()
-        self.city_result_count = 0
         self.current_city = dict()
+        self.city_result_count = 0
+
+        self.current_date = str(datetime.today()).split()[0]
+
 
         # Constants
         self.search_increment = 20
@@ -44,6 +48,8 @@ class Command_Line_Iterface:
         Starts Main Loop
         '''
         while True:
+            self.given_job_title = ""
+            self.city_set = list()
             self.exit = False
             self.clear_function()
             self.display_title()
@@ -119,6 +125,7 @@ class Command_Line_Iterface:
 
     def city_search(self, city):
         self.save_cities = False
+        self.next_city = False
         self.get_city_result_count(city)
         print("Results Found for '{}': {}".format(city, self.city_result_count))
         for page_index in range(0, self.city_result_count, self.search_increment):
@@ -142,6 +149,7 @@ class Command_Line_Iterface:
     
     def page_search(self, city, page_index):
         self.save_page = False
+        self.next_page = False
         current_url = self.generate_url(city, page_index)
         current_soup = self.generate_soup_object(current_url)
             
@@ -152,16 +160,18 @@ class Command_Line_Iterface:
             if self.exit:
                 return
             if not self.save_all:
-                if not self.save_cities:
-                    if not self.save_page:
+                if not self.save_cities and not self.next_city:
+                    if not self.save_page and not self.next_page:
                         self.display_current_job()
                         self.prompt_user_job_options()
                     else:
-                        self.save_post()
+                        if self.save_page:
+                            self.save_post()
                 else:
+                    if self.save_page:
                         self.save_post()
             else:
-                        self.save_post()
+                self.save_post()
                     
     def prompt_user_job_options(self):
         self.display_job_prompt_message()
@@ -169,25 +179,27 @@ class Command_Line_Iterface:
             self.user_response = input()
             
             # Go to next 
-            if self.user_response.lower() == "n":
+            if self.user_response.lower() == "p":
                 # Save post to dict
                 response = self.prompt_user_next_options()
             
                 # Set flag to save the rest of the posts
                 if response == "p":
-                    self.save_page = True
+                    print("skipping...")
+                    self.next_page = True
                     return
             
-                elif self.user_response.lower() == "c":
-                    print("Saving posts, this will take a few seconds...")
-                    self.save_cities = True
+                elif response == "c":
+                    print("skipping...")
+                    self.next_city = True
                     return
+                
+                elif response == "b":
+                    return
+            
+            elif self.user_response.lower() == "n":
+                return
 
-                elif self.user_response.lower() == "a":
-                    print("Saving posts, this will take a few seconds...")
-                    self.save_all = True
-                    return
-            
             # Open page
             elif self.user_response.lower() == "v":
                 print("opening in browser now")
@@ -203,19 +215,23 @@ class Command_Line_Iterface:
                     self.save_page = True
                     return
             
-                elif self.user_response.lower() == "c":
+                elif response == "c":
                     print("Saving posts, this will take a few seconds...")
                     self.save_cities = True
                     return
 
-                elif self.user_response.lower() == "a":
+                elif response == "a":
                     print("Saving posts, this will take a few seconds...")
                     self.save_all = True
                     return
-            
-            elif self.user_response.lower() == "x":
+                
+                elif response == "b":
+                    return
+                
+                
+            elif self.user_response.lower() == "b":
                 self.exit = True
-                print("Exiting...")
+                print("Returning...")
                 return
 
             else:
@@ -267,11 +283,11 @@ class Command_Line_Iterface:
         print("[N]ext Post | [V]iew Post | [S]ave | Ski[P] | [B]ack")
     
     def display_next_prompt_message(self):
-        print("Where do you which to skip?")
-        print("[P]age | [C]ity | [A]ll | [B]ack")
+        print("Where do you want to skip?")
+        print("[P]age | [C]ity | [B]ack")
     
     def display_save_prompt_message(self):
-        print("What do you want to do?")
+        print("What do you want to save?")
         print("[P]age Posts | [C]ity Posts | [A]ll Posts | [B]ack")
 
     def display_current_job(self):
