@@ -1,4 +1,4 @@
-# personal-jobs-database
+# Description
 A personal Python webscraper to find indeed jobs of a given job title for one or more cities and regions
 
 # How to run
