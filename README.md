@@ -10,9 +10,9 @@ A personal Python webscraper to find indeed jobs of a given job title for one or
 3. Run main.py either within main directory or src directory:
 * `python3 src/main.py` or `python3 main.py` within the src directory
 
-Saved csv files can be found in the created 'jobs' directory and are created by date of running the program
+Saved csv files can be found in the created `jobs` directory and are created by the current date of running the program
 * Example file: `2019-08-13.csv`
 
 TODO:
 * Look into GUI design
-* Reach out to people to make potential extension
+* Reach out to people to make potential web extension and server
